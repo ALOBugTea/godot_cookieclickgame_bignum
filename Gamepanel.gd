@@ -8,8 +8,8 @@ const cookie_effect = preload("res://cookieEffect.tscn")
 @onready var cookies_machine = {
 	"autoClicker": {"button": $%AutoClicker, "level": Big.new(0), "cost": Big.new(10), "earnPer": Big.new(1), "time": 3, "txt": "Auto Clicker"},
 	"factory": {"button": $%Factory, "level": Big.new(0), "cost": Big.new(500), "earnPer": Big.new(15), "time": 5, "txt": "Factory"},
-	"machineFactory": {"button": $%MachineFactory, "level": Big.new(0), "cost": Big.new(10000), "time": 7, "earnPer": Big.new(55), "txt": "Machine Factory"},
-	"cokiesCard": {"button": $%CokiesCard, "level": Big.new(0), "cost": Big.new(100000), "time": 10, "earnPer": Big.new(777), "txt": "Cokies Card"},
+	"machineFactory": {"button": $%MachineFactory, "level": Big.new(0), "cost": Big.new(10000), "time": 7, "earnPer": Big.new(250), "txt": "Machine Factory"},
+	"cokiesCard": {"button": $%CokiesCard, "level": Big.new(0), "cost": Big.new(100000), "time": 10, "earnPer": Big.new(1777), "txt": "Cokies Card"},
 }
 var cookies = null
 @onready var cookiesLabel = $Cookies
@@ -17,7 +17,7 @@ var cookies = null
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if cookies == null:
-		cookies = Big.new("0")
+		cookies = Big.new(0)
 	not_enough_cookies.text = ""
 	cookie_earn.pressed.connect(_on_cookie_earn)
 	cookies_machine["autoClicker"]["button"].pressed.connect(_on_cookie_levelUp.bind("autoClicker"))
@@ -25,7 +25,7 @@ func _ready():
 	cookies_machine["machineFactory"]["button"].pressed.connect(_on_cookie_levelUp.bind("machineFactory"))
 	cookies_machine["cokiesCard"]["button"].pressed.connect(_on_cookie_levelUp.bind("cokiesCard"))
 	for which in cookies_machine:
-		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toString() + ", cost: " + cookies_machine[which]["cost"].toString() + "\n "
+		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toAA() + ", cost: " + cookies_machine[which]["cost"].toAA() + "\n "
 	
 	super_cookies.pressed.connect(_supercookie_get)
 	var timer = Timer.new()
@@ -58,24 +58,24 @@ func _supercookie_get():
 					value = lv.multiply(4)
 			nB.plus(value)
 		cookies.plus(nB.multiply(77))
-		var msg = "You got " + nB.toString() + " from Super Cookies!"
+		var msg = "You got " + nB.toAA() + " from Super Cookies!"
 		tips_text(msg)
 func _on_cookie_levelUp(which):
 	if cookies.isLargerThanOrEqualTo(cookies_machine[which]["cost"]) == true:
 		cookies_machine[which]["level"].plus(1)
 		cookies.minus(cookies_machine[which]["cost"])
 		cookies_machine[which]["cost"].multiply(1.349).roundDown()
-		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toString() + ", cost: " + cookies_machine[which]["cost"].toString() + "\n "
+		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toAA() + ", cost: " + cookies_machine[which]["cost"].toAA() + "\n "
 		if cookies_machine[which]["level"].isEqualTo(1):
 			var tween = cookies_machine[which]["button"].create_tween().set_loops()
 			var bar = cookies_machine[which]["button"].get_node("Bar")
 			tween.tween_property(bar, "value", 100, cookies_machine[which]["time"]).set_trans(Tween.TRANS_BOUNCE)
 			tween.tween_callback(_on_cookie_earn.bind(which))
-		var msg = "Level Up! " + which + " is now Level " + cookies_machine[which]["level"].toString() + "!"
+		var msg = "Level Up! " + which + " is now Level " + cookies_machine[which]["level"].toAA() + "!"
 		tips_text(msg)
 	else:
 		var b = Big.new(cookies_machine[which]["cost"])
-		var msg = "You need more " + b.minus(cookies).toString() + " Cookies!"
+		var msg = "You need more " + b.minus(cookies).toAA() + " Cookies!"
 		tips_text(msg)
 func tips_text(msg):
 	not_enough_cookies.text = msg
@@ -88,7 +88,7 @@ func _on_cookie_earn(a = ""):
 	if a != "":
 		#var bar = cookies_machine[a]["button"].get_node("Bar")
 		var earn = Big.new(cookies_machine[a]["earnPer"])
-		#print(cookies_machine[a]["earnPer"].multiply(cookies_machine[a]["level"]).toString())
+		#print(cookies_machine[a]["earnPer"].multiply(cookies_machine[a]["level"]).toAA())
 		cookies.plus(earn.multiply(cookies_machine[a]["level"]))
 		for n in cookies_machine[a]["level"].toFloat():
 			spawn_cookie_effect(3/cookies_machine[a]["level"].toFloat() * 0.1)
@@ -137,7 +137,7 @@ func _process(delta):
 			"cokiesCard":
 				value = lv.multiply(4)
 		nB.plus(value)
-	cookiesLabel.text = "Cookies: " + cookies.toString() + "\n" + "click per get: " + nB.toString()
+	cookiesLabel.text = "Cookies: " + cookies.toAA() + "\n" + "click per get: " + nB.toAA()
 
 func spawn_effect(EFFECT: PackedScene, effect_position: Vector2 = global_position):
 	if EFFECT:
