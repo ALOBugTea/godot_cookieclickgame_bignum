@@ -6,10 +6,10 @@ const cookie_effect = preload("res://cookieEffect.tscn")
 @onready var cookie_earn = $%CookieEarn
 @onready var not_enough_cookies = $%NotEnoughCookies
 @onready var cookies_machine = {
-	"autoClicker": {"button": $%AutoClicker, "level": Big.new(0), "cost": Big.new(10), "earnPer": Big.new(1), "time": 3, "txt": "Auto Clicker"},
-	"factory": {"button": $%Factory, "level": Big.new(0), "cost": Big.new(500), "earnPer": Big.new(15), "time": 5, "txt": "Factory"},
-	"machineFactory": {"button": $%MachineFactory, "level": Big.new(0), "cost": Big.new(10000), "time": 7, "earnPer": Big.new(250), "txt": "Machine Factory"},
-	"cokiesCard": {"button": $%CokiesCard, "level": Big.new(0), "cost": Big.new(100000), "time": 10, "earnPer": Big.new(1777), "txt": "Cokies Card"},
+	"autoClicker": {"button": $%AutoClicker, "level": Big.new(0), "cost": Big.new(10), "earnPer": Big.new(1), "time": 3, "txt": "Auto Clicker", "nextUnlock": $%Factory},
+	"factory": {"button": $%Factory, "level": Big.new(0), "cost": Big.new(500), "earnPer": Big.new(15), "time": 5, "txt": "Factory", "nextUnlock": $%MachineFactory},
+	"machineFactory": {"button": $%MachineFactory, "level": Big.new(0), "cost": Big.new(10000), "time": 7, "earnPer": Big.new(250), "txt": "Machine Factory", "nextUnlock": $%CokiesCard},
+	"cokiesCard": {"button": $%CokiesCard, "level": Big.new(0), "cost": Big.new(100000), "time": 10, "earnPer": Big.new(1777), "txt": "Cokies Card", "nextUnlock": null},
 }
 var cookies = null
 @onready var cookiesLabel = $Cookies
@@ -26,6 +26,8 @@ func _ready():
 	cookies_machine["cokiesCard"]["button"].pressed.connect(_on_cookie_levelUp.bind("cokiesCard"))
 	for which in cookies_machine:
 		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toAA() + ", cost: " + cookies_machine[which]["cost"].toAA() + "\n "
+		if which != "autoClicker":
+			cookies_machine[which]["button"].disabled = true
 	
 	super_cookies.pressed.connect(_supercookie_get)
 	var timer = Timer.new()
@@ -71,6 +73,8 @@ func _on_cookie_levelUp(which):
 			var bar = cookies_machine[which]["button"].get_node("Bar")
 			tween.tween_property(bar, "value", 100, cookies_machine[which]["time"]).set_trans(Tween.TRANS_BOUNCE)
 			tween.tween_callback(_on_cookie_earn.bind(which))
+			if cookies_machine[which]["nextUnlock"]:
+				cookies_machine[which]["nextUnlock"].disabled = false
 		var msg = "Level Up! " + which + " is now Level " + cookies_machine[which]["level"].toAA() + "!"
 		tips_text(msg)
 	else:
