@@ -1,0 +1,133 @@
+[gd_scene load_steps=3 format=3 uid="uid://c706yt48sb5ch"]
+
+[ext_resource type="Script" path="res://Gamepanel.gd" id="1_m36x0"]
+[ext_resource type="Texture2D" uid="uid://brxup5r5dcgdu" path="res://cookie.png" id="1_xfn8t"]
+
+[node name="Panel" type="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_m36x0")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 0
+offset_left = 498.0
+offset_top = 129.0
+offset_right = 798.0
+offset_bottom = 481.0
+
+[node name="AutoClicker" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Auto Clicker
+cost: 10
+ "
+
+[node name="Bar" type="ProgressBar" parent="VBoxContainer/AutoClicker"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -27.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Factory" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Factory
+cost: 1000
+ "
+
+[node name="Bar" type="ProgressBar" parent="VBoxContainer/Factory"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -27.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MachineFactory" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Machine Factory
+cost: 50000
+ "
+
+[node name="Bar" type="ProgressBar" parent="VBoxContainer/MachineFactory"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -27.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="CokiesCard" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cokies Card
+cost: 300000
+ "
+
+[node name="Bar" type="ProgressBar" parent="VBoxContainer/CokiesCard"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -27.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Cookies" type="Label" parent="."]
+layout_mode = 2
+offset_left = 334.0
+offset_top = 47.0
+offset_right = 482.0
+offset_bottom = 70.0
+text = "Cookies
+"
+horizontal_alignment = 1
+
+[node name="NotEnoughCookies" type="Label" parent="."]
+layout_mode = 2
+offset_left = 117.0
+offset_top = 451.0
+offset_right = 362.0
+offset_bottom = 474.0
+text = "NotEnoughCookies"
+horizontal_alignment = 1
+
+[node name="CookieEarn" type="Button" parent="."]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 183.0
+offset_right = 364.0
+offset_bottom = 447.0
+icon = ExtResource("1_xfn8t")
+flat = true
