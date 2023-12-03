@@ -19,6 +19,7 @@ so I try it to make a click game such as cookies clicker
 - [ ] Balance of game
 - [x] SaveLoad System (new)
 - [x] Reset save button (new)
+- [ ] The goal of game
 ## Tips of use Big.gd
 When you want to make some value checking, becareful on calling class.
 
