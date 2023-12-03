@@ -159,10 +159,10 @@ expand_mode = 2
 
 [node name="resetSaveButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 710.0
-offset_top = 565.0
-offset_right = 797.0
-offset_bottom = 596.0
+offset_left = 700.0
+offset_top = 550.0
+offset_right = 800.0
+offset_bottom = 600.0
 text = "reset save"
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="resetSaveButton"]
