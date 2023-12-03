@@ -1,7 +1,7 @@
 # Cookie Click Game
 A click game demo, made from godot 4 with Big.gd
 
-![image](screenshot.png)
+![image](screenshot2.png)
 
 Big.gd is a GodotBigNumberClass which use for very big number,
 so I try it to make a click game such as cookies clicker
@@ -17,7 +17,8 @@ so I try it to make a click game such as cookies clicker
 - [x] Every number change to Big class
 - [ ] Achievements
 - [ ] Balance of game
-
+- [x] SaveLoad System (new)
+- [x] Reset save button (new)
 ## Tips of use Big.gd
 When you want to make some value checking, becareful on calling class.
 
