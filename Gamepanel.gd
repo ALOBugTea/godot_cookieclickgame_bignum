@@ -10,25 +10,71 @@ const cookie_effect = preload("res://cookieEffect.tscn")
 	"factory": {"button": $%Factory, "level": Big.new(0), "cost": Big.new(500), "earnPer": Big.new(15), "time": 5, "txt": "Factory", "nextUnlock": $%MachineFactory},
 	"machineFactory": {"button": $%MachineFactory, "level": Big.new(0), "cost": Big.new(10000), "time": 7, "earnPer": Big.new(250), "txt": "Machine Factory", "nextUnlock": $%CokiesCard},
 	"cokiesCard": {"button": $%CokiesCard, "level": Big.new(0), "cost": Big.new(100000), "time": 10, "earnPer": Big.new(1777), "txt": "Cokies Card", "nextUnlock": null},
-}
+	}
 var cookies = null
-@onready var cookiesLabel = $Cookies
+var deletedSave = false
 
+@onready var cookiesLabel = $Cookies
+func _save():
+	var savePath = {
+		"cookies": {"mantissa":cookies.mantissa, "exponent":cookies.exponent},
+		"cookies_machine": {}
+		}
+	for cm in cookies_machine:
+		savePath["cookies_machine"][cm] = {}
+		for data in cookies_machine[cm]:
+			var canSave = false
+			match data:
+				"level":
+					canSave = true
+				"cost":
+					canSave = true
+				"earnPer":
+					canSave = true
+			if canSave:
+				savePath["cookies_machine"][cm][data] = {"mantissa": cookies_machine[cm][data].mantissa, "exponent": cookies_machine[cm][data].exponent}
+	return savePath
+																																																																							
+func _exit_tree():
+	var save_game = FileAccess.open("user://savegame.save", FileAccess.WRITE)
+	if deletedSave:
+		if FileAccess.file_exists("user://savegame.save"):
+			save_game.store_string("reset")
+		return
+	var sp = call("_save")
+	var json_string = JSON.stringify(sp)
+	save_game.store_string(json_string)
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	for which in cookies_machine:
+		if which != "autoClicker":
+			cookies_machine[which]["button"].disabled = true
 	if cookies == null:
 		cookies = Big.new(0)
+		if FileAccess.file_exists("user://savegame.save"):
+			var save_game = FileAccess.open("user://savegame.save", FileAccess.READ)
+			var json_string = save_game.get_line()
+			if json_string != "reset":
+				var json = JSON.new()
+				var parse_result = json.parse(json_string)
+				if parse_result == OK:
+					var result = json.get_data()
+					cookies.mantissa = result["cookies"]["mantissa"]
+					cookies.exponent = result["cookies"]["exponent"]
+					var csm = result["cookies_machine"]
+					for cm in csm:
+						for cmd in csm[cm]:
+							cookies_machine[cm][cmd].mantissa = csm[cm][cmd].mantissa
+							cookies_machine[cm][cmd].exponent = csm[cm][cmd].exponent
+						_cookies_machine_init(cm)
+	for which in cookies_machine:
+		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toAA() + ", cost: " + cookies_machine[which]["cost"].toAA() + "\n "
 	not_enough_cookies.text = ""
 	cookie_earn.pressed.connect(_on_cookie_earn)
 	cookies_machine["autoClicker"]["button"].pressed.connect(_on_cookie_levelUp.bind("autoClicker"))
 	cookies_machine["factory"]["button"].pressed.connect(_on_cookie_levelUp.bind("factory"))
 	cookies_machine["machineFactory"]["button"].pressed.connect(_on_cookie_levelUp.bind("machineFactory"))
 	cookies_machine["cokiesCard"]["button"].pressed.connect(_on_cookie_levelUp.bind("cokiesCard"))
-	for which in cookies_machine:
-		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toAA() + ", cost: " + cookies_machine[which]["cost"].toAA() + "\n "
-		if which != "autoClicker":
-			cookies_machine[which]["button"].disabled = true
-	
 	super_cookies.pressed.connect(_supercookie_get)
 	var timer = Timer.new()
 	super_cookies.add_child(timer)
@@ -36,6 +82,19 @@ func _ready():
 	timer.start()
 	super_cookies.visible = false
 	timer.timeout.connect(_supercookie_visible)
+	$resetSaveButton.pressed.connect(resetConfirm)
+
+func resetConfirm():
+	$resetSaveButton/ConfirmationDialog.show()
+	$resetSaveButton/ConfirmationDialog.confirmed.connect(resetButton)
+	await $resetSaveButton/ConfirmationDialog.canceled
+	$resetSaveButton/ConfirmationDialog.disconnect("confirmed", resetButton)
+	pass
+
+func resetButton():
+	deletedSave = true
+	get_tree().change_scene_to_file("res://Game.tscn")
+
 func _supercookie_visible():
 	super_cookies.visible = true
 
@@ -62,6 +121,17 @@ func _supercookie_get():
 		cookies.plus(nB.multiply(77))
 		var msg = "You got " + nB.toAA() + " from Super Cookies!"
 		tips_text(msg)
+
+func _cookies_machine_init(which):
+	if cookies_machine[which]["level"].isLessThanOrEqualTo(0):
+		return
+	var tween = cookies_machine[which]["button"].create_tween().set_loops()
+	var bar = cookies_machine[which]["button"].get_node("Bar")
+	tween.tween_property(bar, "value", 100, cookies_machine[which]["time"]).set_trans(Tween.TRANS_BOUNCE)
+	tween.tween_callback(_on_cookie_earn.bind(which))
+	if cookies_machine[which]["nextUnlock"]:
+		cookies_machine[which]["nextUnlock"].disabled = false
+
 func _on_cookie_levelUp(which):
 	if cookies.isLargerThanOrEqualTo(cookies_machine[which]["cost"]) == true:
 		cookies_machine[which]["level"].plus(1)
@@ -69,12 +139,7 @@ func _on_cookie_levelUp(which):
 		cookies_machine[which]["cost"].multiply(1.349).roundDown()
 		cookies_machine[which]["button"].text = cookies_machine[which]["txt"] + "\n Level: " + cookies_machine[which]["level"].toAA() + ", cost: " + cookies_machine[which]["cost"].toAA() + "\n "
 		if cookies_machine[which]["level"].isEqualTo(1):
-			var tween = cookies_machine[which]["button"].create_tween().set_loops()
-			var bar = cookies_machine[which]["button"].get_node("Bar")
-			tween.tween_property(bar, "value", 100, cookies_machine[which]["time"]).set_trans(Tween.TRANS_BOUNCE)
-			tween.tween_callback(_on_cookie_earn.bind(which))
-			if cookies_machine[which]["nextUnlock"]:
-				cookies_machine[which]["nextUnlock"].disabled = false
+			_cookies_machine_init(which)
 		var msg = "Level Up! " + which + " is now Level " + cookies_machine[which]["level"].toAA() + "!"
 		tips_text(msg)
 	else:
@@ -90,8 +155,9 @@ func tips_text(msg):
 
 func _on_cookie_earn(a = ""):
 	if a != "":
-		#var bar = cookies_machine[a]["button"].get_node("Bar")
+		var bar = cookies_machine[a]["button"].get_node("Bar")
 		var earn = Big.new(cookies_machine[a]["earnPer"])
+		bar.value = 0
 		#print(cookies_machine[a]["earnPer"].multiply(cookies_machine[a]["level"]).toAA())
 		cookies.plus(earn.multiply(cookies_machine[a]["level"]))
 		for n in cookies_machine[a]["level"].toFloat():
